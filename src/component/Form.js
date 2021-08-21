@@ -1,6 +1,6 @@
 import React from "react";
 import { MdSend } from "react-icons/md";
-const Form = () => {
+const Form = (props) => {
   return (
     <from>
       <div className="form-center">
@@ -11,21 +11,25 @@ const Form = () => {
             className="form-control"
             id="charge"
             name="charge"
-            placeholder="e.g. rent"
+            placeholder="e.g rent"
+            value={props.charge}
+            onChange={props.handleCharge}
           />
         </div>
         <div className="form-group">
           <label htmlFor="amount">Amount</label>
           <input
-            type="text"
+            type="number"
             className="form-control"
             id="amount"
             name="amount"
             placeholder="$200"
+            value={props.amount}
+            onChange={props.handleAmount}
           />
         </div>
       </div>
-      <button type="submit" className="btn">
+      <button type="submit" onClick={props.handleSubmit} className="btn">
         Submit
         <MdSend className="btn-icon" />
       </button>
