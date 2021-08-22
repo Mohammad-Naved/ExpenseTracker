@@ -1,21 +1,32 @@
-import { React, useState } from "react";
+import { React, useState, useEffect } from "react";
 import "./App.css";
 import Alert from "./component/Alert";
 import Form from "./component/Form";
 import List from "./component/List";
 import { v4 as uuidv4 } from "uuid";
 
-const initialExpense = [
-  { id: uuidv4(), charge: "rent", amount: 1600 },
-  { id: uuidv4(), charge: "groceries", amount: 2600 },
-  { id: uuidv4(), charge: "credit bill", amount: 4500 },
-];
+// const initialExpense = [
+//   { id: uuidv4(), charge: "rent", amount: 1600 },
+//   { id: uuidv4(), charge: "groceries", amount: 2600 },
+//   { id: uuidv4(), charge: "credit bill", amount: 4500 },
+// ];
+
+const initialExpense = localStorage.getItem("expenses")
+  ? JSON.parse(localStorage.getItem("expenses"))
+  : [];
 
 function App() {
   const [expenses, setExpenses] = useState(initialExpense);
   const [charge, setCharge] = useState("");
   const [amount, setAmount] = useState("");
   const [alert, setAlert] = useState({ show: false });
+  const [edit, setEdit] = useState(false);
+  const [id, setId] = useState(0);
+
+  useEffect(() => {
+    console.log(" We calling use effect");
+    localStorage.setItem("expenses", JSON.stringify(expenses));
+  }, [expenses]);
 
   const handleCharge = (e) => {
     setCharge(e.target.value);
@@ -35,9 +46,19 @@ function App() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (charge !== "" && amount > 0) {
-      const singleExpense = { id: uuidv4(), charge, amount };
-      setExpenses([...expenses, singleExpense]);
-      handleAlert({ type: "success", text: "Item added" });
+      if (edit) {
+        let temExpense = expenses.map((item) => {
+          return item.id === id ? { ...item, charge, amount } : item;
+        });
+        setExpenses(temExpense);
+        setEdit(false);
+        handleAlert({ type: "success", text: "Item " });
+      } else {
+        const singleExpense = { id: uuidv4(), charge, amount };
+        setExpenses([...expenses, singleExpense]);
+        handleAlert({ type: "success", text: "Item added" });
+      }
+
       setCharge("");
       setAmount("");
     } else {
@@ -54,7 +75,12 @@ function App() {
     handleAlert({ type: "danger", text: "All Item Deleted" });
   };
   const handleEdit = (id) => {
-    console.log(`Item edited ${id}`);
+    let expense = expenses.find((item) => item.id === id);
+    let { charge, amount } = expense;
+    setCharge(charge);
+    setAmount(amount);
+    setEdit(true);
+    setId(id);
   };
   const handleDeleteOne = (id) => {
     let temExpenses = expenses.filter((item) => item.id !== id);
@@ -73,6 +99,7 @@ function App() {
           handleCharge={handleCharge}
           amount={amount}
           handleAmount={handleAmount}
+          edit={edit}
         />
         <List
           expenses={expenses}

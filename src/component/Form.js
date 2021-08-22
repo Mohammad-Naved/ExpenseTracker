@@ -30,7 +30,7 @@ const Form = (props) => {
         </div>
       </div>
       <button type="submit" onClick={props.handleSubmit} className="btn">
-        Submit
+        {props.edit === true ? "Edit" : "Submit"}
         <MdSend className="btn-icon" />
       </button>
     </from>
